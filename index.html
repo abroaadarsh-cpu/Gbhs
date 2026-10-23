@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GBHS Gabber Massan</title>
+<style>
+:root {
+  --primary: #075e54;
+  --secondary: #0b806d;
+  --light: #f2f8f6;
+  --text: #20312e;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--light);
+  color: var(--text);
+}
+header {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  padding: 30px 16px;
+  text-align: center;
+}
+header h1 { margin: 0 0 10px; }
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: white;
+  position: sticky;
+  top: 0;
+  box-shadow: 0 2px 8px #0001;
+  z-index: 5;
+}
+button, .button {
+  border: 0;
+  border-radius: 8px;
+  background: var(--primary);
+  color: white;
+  padding: 11px 15px;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: none;
+}
+button:hover, .button:hover { background: var(--secondary); }
+button.secondary { background: #e5efec; color: var(--primary); }
+main { max-width: 1050px; margin: auto; padding: 20px 14px; }
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 14px;
+  margin-bottom: 18px;
+  box-shadow: 0 3px 14px #0000000a;
+}
+h2 { color: var(--primary); margin-top: 0; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+input, textarea, select {
+  width: 100%;
+  padding: 11px;
+  margin: 6px 0 12px;
+  border: 1px solid #ccd8d4;
+  border-radius: 8px;
+  font: inherit;
+}
+textarea { min-height: 110px; resize: vertical; }
+label { display: block; font-weight: bold; }
+.muted { color: #64736f; font-size: 14px; }
+#adminBar {
+  background: #fff6d8;
+  padding: 14px;
+  margin: 12px auto;
+  max-width: 1050px;
+  border-radius: 10px;
+}
+#adminBar[hidden] { display: none; }
+#status { margin: 12px 0; font-size: 14px; }
+#status.error { color: #b42318; }
+#status.success { color: #087443; }
+.item {
+  border: 1px solid #e2ebe7;
+  padding: 12px;
+  border-radius: 10px;
+  overflow-wrap: anywhere;
+}
+.item img { width: 100%; border-radius: 8px; }
+footer {
+  background: var(--primary);
+  color: white;
+  text-align: center;
+  padding: 24px 12px;
+  margin-top: 25px;
+}
+dialog {
+  width: min(440px, calc(100% - 28px));
+  border: 0;
+  border-radius: 14px;
+  padding: 22px;
+  box-shadow: 0 10px 50px #0003;
+}
+dialog::backdrop { background: #0008; }
+.dialog-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Government Boys High School</h1>
+  <h2 style="color:white">Gabber Massan</h2>
+  <p>Education • Knowledge • A Brighter Future</p>
+</header>
+
+<nav>
+  <button onclick="showSection('home')">Home</button>
+  <button onclick="showSection('about')">Introduction</button>
+  <button onclick="showSection('staff')">Headmaster's Message</button>
+  <button onclick="showSection('results')">Results</button>
+  <button onclick="showSection('images')">Images</button>
+  <button onclick="showSection('videos')">Videos</button>
+  <button onclick="showSection('certificates')">Certificates & PDFs</button>
+  <button onclick="showSection('essays')">Essays</button>
+  <button id="staffLink" class="secondary" onclick="openPasswordDialog()">Staff Login</button>
+</nav>
+
+<div id="adminBar" hidden>
+  <strong>Staff editing mode</strong>
+  <p class="muted">Changes are published to the GitHub repository for everyone to see.</p>
+  <button onclick="editContent()">Edit website content</button>
+  <button onclick="signOut()" class="secondary">Sign out</button>
+</div>
+
+<main>
+  <section id="home" class="page">
+    <div class="card">
+      <h2>Welcome to Our School</h2>
+      <p id="welcomeText">Welcome to Government Boys High School, Gabber Massan. Our goal is to provide quality education and help students build a successful future.</p>
+    </div>
+    <div class="card">
+      <h2>School Information</h2>
+      <div class="grid">
+        <div class="item"><strong>School</strong><p>GBHS Gabber Massan</p></div>
+        <div class="item"><strong>Classes</strong><p>Class 6 to Class 10</p></div>
+        <div class="item"><strong>Location</strong><p>Gabber Massan, near Badah</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="page" hidden>
+    <div class="card">
+      <h2>School Introduction</h2>
+      <p id="aboutText">Our school supports students in learning, personal development, and academic achievement.</p>
+    </div>
+  </section>
+
+  <section id="staff" class="page" hidden>
+    <div class="card">
+      <h2>Headmaster's Message</h2>
+      <p id="headmasterText">Welcome to our school website. We encourage students to work hard, respect their teachers, and pursue knowledge.</p>
+    </div>
+  </section>
+
+  <section id="results" class="page" hidden>
+    <div class="card">
+      <h2>Student Results</h2>
+      <p class="muted">School results and announcements will appear here.</p>
+      <div id="resultsList" class="grid"></div>
+    </div>
+  </section>
+
+  <section id="images" class="page" hidden>
+    <div class="card">
+      <h2>School Images</h2>
+      <div id="imagesList" class="grid"></div>
+    </div>
+  </section>
+
+  <section id="videos" class="page" hidden>
+    <div class="card">
+      <h2>School Videos</h2>
+      <div id="videosList" class="grid"></div>
+    </div>
+  </section>
+
+  <section id="certificates" class="page" hidden>
+    <div class="card">
+      <h2>Certificates & PDFs</h2>
+      <div id="certificatesList" class="grid"></div>
+    </div>
+  </section>
+
+  <section id="essays" class="page" hidden>
+    <div class="card">
+      <h2>Essays & Articles</h2>
+      <div id="essaysList" class="grid"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Website Information</h2>
+    <p class="muted">Official school information should be verified by school staff before publication.</p>
+    <div id="status" role="status"></div>
+  </section>
+</main>
+
+<footer>
+  <p>Government Boys High School, Gabber Massan</p>
+  <p>Learning Today, Leading Tomorrow</p>
+</footer>
+
+<dialog id="authDlg">
+  <h2>Staff Login</h2>
+  <p class="muted">Enter the staff password first. To publish global changes, you must also provide a GitHub token with write access to this repository.</p>
+
+  <label for="staffPassword">Staff password</label>
+  <input id="staffPassword" type="password" autocomplete="current-password" placeholder="Enter staff password">
+
+  <div id="tokenArea" hidden>
+    <label for="githubToken">GitHub token</label>
+    <input id="githubToken" type="password" autocomplete="off" placeholder="GitHub personal access token">
+    <p class="muted">Use a fine-grained token restricted to this repository with Contents: Read and write. Do not share it with anyone.</p>
+  </div>
+
+  <div id="loginError" class="muted" style="color:#b42318"></div>
+  <div class="dialog-actions">
+    <button id="continueBtn" onclick="checkStaffPassword()">Continue</button>
+    <button class="secondary" onclick="closeLogin()">Cancel</button>
+  </div>
+</dialog>
+
+<dialog id="editDlg">
+  <h2>Edit School Content</h2>
+  <label for="welcomeInput">Homepage welcome text</label>
+  <textarea id="welcomeInput"></textarea>
+
+  <label for="aboutInput">School introduction</label>
+  <textarea id="aboutInput"></textarea>
+
+  <label for="headmasterInput">Headmaster's message</label>
+  <textarea id="headmasterInput"></textarea>
+
+  <label for="resultsInput">Results (one entry per line)</label>
+  <textarea id="resultsInput" placeholder="Class 10 — Result announcement"></textarea>
+
+  <label for="imagesInput">Image URLs (one per line)</label>
+  <textarea id="imagesInput" placeholder="https://example.com/school-photo.jpg"></textarea>
+
+  <label for="videosInput">YouTube links (one per line)</label>
+  <textarea id="videosInput" placeholder="https://www.youtube.com/watch?v=..."></textarea>
+
+  <label for="certificatesInput">Certificate/PDF URLs (one per line)</label>
+  <textarea id="certificatesInput" placeholder="https://example.com/document.pdf"></textarea>
+
+  <label for="essaysInput">Essay/article entries (one per line)</label>
+  <textarea id="essaysInput" placeholder="Essay title | https://example.com/essay"></textarea>
+
+  <div class="dialog-actions">
+    <button onclick="saveContent()">Publish changes</button>
+    <button class="secondary" onclick="document.getElementById('editDlg').close()">Cancel</button>
+  </div>
+</dialog>
+
+<script>
+/*
+  CONFIGURATION
+  Change owner/repo if your GitHub repository has a different name.
+
+  SECURITY:
+  A password inside client-side JavaScript is visible to visitors.
+  This is only a basic gate. Use a secure backend or Firebase Authentication
+  with database security rules for real access control.
+*/
+const CFG = {
+  owner: "abroaadarsh-cpu",
+  repo: "gbhs-gabber-massan",
+  file: "data/content.json"
+};
+
+/*
+  Replace this placeholder with your staff password.
+  Do not treat this client-side check as secure authentication.
+*/
+const STAFF_PASSWORD = "REPLACE_WITH_YOUR_STAFF_PASSWORD";
+
+const DEFAULT_CONTENT = {
+  welcome: "Welcome to Government Boys High School, Gabber Massan. Our goal is to provide quality education and help students build a successful future.",
+  about: "Our school supports students in learning, personal development, and academic achievement.",
+  headmaster: "Welcome to our school website. We encourage students to work hard, respect their teachers, and pursue knowledge.",
+  results: [],
+  images: [],
+  videos: [],
+  certificates: [],
+  essays: []
+};
+
+let content = structuredCloneSafe(DEFAULT_CONTENT);
+let githubToken = "";
+let canEdit = false;
+let passwordPassed = false;
+let fileSha = null;
+
+function structuredCloneSafe(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
+
+function setStatus(message, type = "") {
+  const el = document.getElementById("status");
+  el.textContent = message;
+  el.className = type;
+}
+
+function showSection(id) {
+  document.querySelectorAll(".page").forEach(section => {
+    section.hidden = section.id !== id;
+  });
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function openPasswordDialog() {
+  if (canEdit) {
+    signOut();
+    return;
+  }
+  document.getElementById("staffPassword").value = "";
+  document.getElementById("githubToken").value = "";
+  document.getElementById("tokenArea").hidden = true;
+  document.getElementById("loginError").textContent = "";
+  passwordPassed = false;
+  document.getElementById("authDlg").showModal();
+}
+
+function closeLogin() {
+  document.getElementById("authDlg").close();
+}
+
+function checkStaffPassword() {
+  const entered = document.getElementById("staffPassword").value;
+
+  if (!entered) {
+    document.getElementById("loginError").textContent = "Please enter the staff password.";
+    return;
+  }
+
+  if (entered !== STAFF_PASSWORD) {
+    document.getElementById("loginError").textContent = "Incorrect staff password.";
+    return;
+  }
+
+  passwordPassed = true;
+  document.getElementById("tokenArea").hidden = false;
+  document.getElementById("loginError").textContent =
+    "Password accepted. Enter the GitHub token to enable global editing.";
+  document.getElementById("continueBtn").textContent = "Sign in with GitHub";
+  document.getElementById("continueBtn").onclick = signInWithGitHub;
+}
+
+async function signInWithGitHub() {
+  if (!passwordPassed) {
+    document.getElementById("loginError").textContent = "Enter the staff password first.";
+    return;
+  }
+
+  const tk = document.getElementById("githubToken").value.trim();
+  if (!tk) {
+    document.getElementById("loginError").textContent = "Please enter a GitHub token.";
+    return;
+  }
+
+  githubToken = tk;
+
+  try {
+    const repo = await githubRequest(`/repos/${CFG.owner}/${CFG.repo}`);
+
+    if (repo.permissions && !repo.permissions.push) {
+      throw new Error("This GitHub account cannot write to the repository.");
+    }
+
+    await loadGlobalContent();
+
+    canEdit = true;
+    document.getElementById("adminBar").hidden = false;
+    document.getElementById("staffLink").textContent = "Sign out";
+    closeLogin();
+    setStatus("Staff signed in. You can edit and publish website content.", "success");
+  } catch (err) {
+    githubToken = "";
+    canEdit = false;
+    document.getElementById("loginError").textContent =
+      "Sign-in failed: " + (err.message || "Check the token and repository settings.");
+  }
+}
+
+async function githubRequest(path, options = {}) {
+  const response = await fetch("https://api.github.com" + path, {
+    ...options,
+    headers: {
+      "Accept": "application/vnd.github+json",
+      "Authorization": "Bearer " + githubToken,
+      "X-GitHub-Api-Version": "2022-11-28",
+      ...(options.headers || {})
+    }
+  });
+
+  const raw = await response.text();
+  let data = {};
+  try { data = raw ? JSON.parse(raw) : {}; } catch {}
+
+  if (!response.ok) {
+    const error = new Error(data.message || `GitHub request failed (${response.status})`);
+    error.status = response.status;
+    throw error;
+  }
+
+  return data;
+}
+
+function encodeBase64Utf8(text) {
+  const bytes = new TextEncoder().encode(text);
+  let binary = "";
+  bytes.forEach(byte => binary += String.fromCharCode(byte));
+  return btoa(binary);
+}
+
+function decodeBase64Utf8(base64) {
+  const binary = atob(base64.replace(/\n/g, ""));
+  const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+}
+
+async function loadGlobalContent() {
+  try {
+    const file = await githubRequest(
+      `/repos/${CFG.owner}/${CFG.repo}/contents/${CFG.file}`
+    );
+    fileSha = file.sha;
+    content = {
+      ...structuredCloneSafe(DEFAULT_CONTENT),
+      ...JSON.parse(decodeBase64Utf8(file.content))
+    };
+  } catch (err) {
+    if (err.status === 404) {
+      fileSha = null;
+      content = structuredCloneSafe(DEFAULT_CONTENT);
+    } else {
+      throw err;
+    }
+  }
+
+  renderContent();
+}
+
+function renderList(elementId, items, type) {
+  const container = document.getElementById(elementId);
+  container.innerHTML = "";
+
+  if (!Array.isArray(items) || items.length === 0) {
+    container.innerHTML = '<p class="muted">Nothing has been added yet.</p>';
+    return;
+  }
+
+  items.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "item";
+
+    if (type === "image") {
+      const img = document.createElement("img");
+      img.src = item;
+      img.alt = "School image";
+      img.loading = "lazy";
+      img.onerror = () => img.replaceWith(document.createTextNode("Image could not be loaded."));
+      card.appendChild(img);
+      const link = document.createElement("a");
+      link.href = item;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = "Open image";
+      card.appendChild(link);
+    } else if (type === "video") {
+      const link = document.createElement("a");
+      link.href = item;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = item;
+      card.appendChild(link);
+    } else if (type === "document") {
+      const link = document.createElement("a");
+      link.href = item;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = item;
+      card.appendChild(link);
+    } else {
+      const parts = String(item).split("|");
+      const title = document.createElement("strong");
+      title.textContent = parts[0] || "School update";
+      card.appendChild(title);
+
+      if (parts[1]) {
+        const link = document.createElement("a");
+        link.href = parts[1].trim();
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = "Open";
+        card.appendChild(document.createElement("br"));
+        card.appendChild(link);
+      }
+    }
+
+    container.appendChild(card);
+  });
+}
+
+function renderContent() {
+  document.getElementById("welcomeText").textContent = content.welcome || "";
+  document.getElementById("aboutText").textContent = content.about || "";
+  document.getElementById("headmasterText").textContent = content.headmaster || "";
+
+  renderList("resultsList", content.results, "text");
+  renderList("imagesList", content.images, "image");
+  renderList("videosList", content.videos, "video");
+  renderList("certificatesList", content.certificates, "document");
+  renderList("essaysList", content.essays, "text");
+}
+
+function editContent() {
+  if (!canEdit) {
+    setStatus("Please sign in first.", "error");
+    return;
+  }
+
+  document.getElementById("welcomeInput").value = content.welcome || "";
+  document.getElementById("aboutInput").value = content.about || "";
+  document.getElementById("headmasterInput").value = content.headmaster || "";
+  document.getElementById("resultsInput").value = (content.results || []).join("\n");
+  document.getElementById("imagesInput").value = (content.images || []).join("\n");
+  document.getElementById("videosInput").value = (content.videos || []).join("\n");
+  document.getElementById("certificatesInput").value = (content.certificates || []).join("\n");
+  document.getElementById("essaysInput").value = (content.essays || []).join("\n");
+
+  document.getElementById("editDlg").showModal();
+}
+
+function lines(id) {
+  return document.getElementById(id).value
+    .split("\n")
+    .map(value => value.trim())
+    .filter(Boolean);
+}
+
+async function saveContent() {
+  if (!canEdit || !githubToken) {
+    setStatus("You must sign in before publishing.", "error");
+    return;
+  }
+
+  const next = {
+    welcome: document.getElementById("welcomeInput").value.trim(),
+    about: document.getElementById("aboutInput").value.trim(),
+    headmaster: document.getElementById("headmasterInput").value.trim(),
+    results: lines("resultsInput"),
+    images: lines("imagesInput"),
+    videos: lines("videosInput"),
+    certificates: lines("certificatesInput"),
+    essays: lines("essaysInput")
+  };
+
+  const body = {
+    message: "Update school website content",
+    content: encodeBase64Utf8(JSON.stringify(next, null, 2)),
+    ...(fileSha ? { sha: fileSha } : {})
+  };
+
+  try {
+    const saved = await githubRequest(
+      `/repos/${CFG.owner}/${CFG.repo}/contents/${CFG.file}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      }
+    );
+
+    fileSha = saved.content?.sha || fileSha;
+    content = next;
+    renderContent();
+    document.getElementById("editDlg").close();
+    setStatus("Published successfully. GitHub Pages may take a few minutes to update.", "success");
+  } catch (err) {
+    setStatus("Could not publish: " + err.message, "error");
+  }
+}
+
+function signOut() {
+  githubToken = "";
+  canEdit = false;
+  passwordPassed = false;
+  document.getElementById("adminBar").hidden = true;
+  document.getElementById("staffLink").textContent = "Staff Login";
+  document.getElementById("authDlg").close();
+  document.getElementById("editDlg").close();
+  setStatus("Signed out.");
+}
+
+async function loadPublicContent() {
+  try {
+    const url = `https://raw.githubusercontent.com/${CFG.owner}/${CFG.repo}/main/${CFG.file}?t=${Date.now()}`;
+    const response = await fetch(url);
+    if (!response.ok) return;
+    content = {
+      ...structuredCloneSafe(DEFAULT_CONTENT),
+      ...await response.json()
+    };
+    renderContent();
+  } catch (err) {
+    renderContent();
+  }
+}
+
+loadPublicContent();
+</script>
+</body>
+</html>
